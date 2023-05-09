@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>~로또 번호 생성기~</title>
+    <style>
+      #result {
+        margin-top: 10px;
+        font-size: 20px;
+        font-weight: bold;
+      }
+      label {
+        display: inline-block;
+        width: 2em;
+        text-align: center;
+      }
+      #title {
+        font-size: 48px;
+        font-weight: bold;
+        -webkit-text-stroke: 0.5px white;
+        background-image: linear-gradient(
+          to left,
+          red,
+          orange,
+          yellow,
+          green,
+          blue,
+          indigo
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      #con {
+        height: 50vh;
+        background: no-repeat url("보노보노.png");
+        background-size: contain;
+        background-position: center;
+        text-align: center;
+        padding: 50px;
+      }
+      #background {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #column {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #formarea {
+        margin: 10px;
+      }
+    </style>
+    <script>
+      function getRandomNumbers() {
+        const checkboxes = document.getElementById("exclude");
+        const checkedCheckboxes = Array.from(checkboxes).filter(
+          (checkbox) => checkbox.checked
+        );
+        const uncheckedCheckboxes = Array.from(checkboxes).filter(
+          (checkbox) => !checkbox.checked
+        );
+
+        const checkboxes2 = document.getElementById("include");
+        const includecheckedCheckboxes = Array.from(checkboxes2).filter(
+          (checkbox) => checkbox.checked
+        );
+
+        if (checkedCheckboxes.length > 40) {
+          alert("제외할 숫자는 최대 40개까지만 선택 가능합니다.");
+          return;
+        }
+
+        if (includecheckedCheckboxes.length > 5) {
+          alert("포함할 숫자는 최대 5개까지만 선택 가능합니다.");
+          return;
+        }
+
+        const excludedNumbers = checkedCheckboxes.map((checkbox) =>
+          Number(checkbox.value)
+        );
+        const randomNumbers = [];
+
+        if (includecheckedCheckboxes.length > 0) {
+          for (let i = 0; i < includecheckedCheckboxes.length; i++) {
+            const includeValue = Number(includecheckedCheckboxes[i].value);
+            if (
+              !excludedNumbers.includes(includeValue) &&
+              !randomNumbers.includes(includeValue)
+            ) {
+              randomNumbers.push(includeValue);
+            }
+          }
+        }
+
+        while (randomNumbers.length < 5) {
+          const randomNum = Math.floor(Math.random() * 45) + 1;
+          if (
+            !excludedNumbers.includes(randomNum) &&
+            !randomNumbers.includes(randomNum)
+          ) {
+            randomNumbers.push(randomNum);
+          }
+        }
+
+        randomNumbers.sort((previous, current) => previous - current);
+
+        const resultDiv = document.getElementById("result");
+        resultDiv.textContent = "결과: " + randomNumbers.join(", ");
+      }
+
+      function handleCheckboxChange(event) {
+        const { checked, value, name } = event.target;
+
+        if (name === "exclude") {
+          const includeCheckboxes = document.querySelectorAll(
+            `#include input[type="checkbox"][value="${value}"]`
+          );
+          includeCheckboxes.forEach(
+            (checkbox) => (checkbox.disabled = checked)
+          );
+        } else if (name === "include") {
+          const excludeCheckboxes = document.querySelectorAll(
+            `#exclude input[type="checkbox"][value="${value}"]`
+          );
+          excludeCheckboxes.forEach(
+            (checkbox) => (checkbox.disabled = checked)
+          );
+        }
+      }
+
+      function createCheckboxes() {
+        const exform = document.getElementById("exclude");
+        exform.style.whiteSpace = "nowrap";
+        for (let i = 1; i <= 45; i++) {
+          const div = document.createElement("div");
+          div.style.display = "inline-block";
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = "exclude";
+          checkbox.value = i;
+          const label = document.createElement("label");
+          label.textContent = i;
+          div.appendChild(checkbox);
+          div.appendChild(label);
+          exform.appendChild(div);
+          if (i % 5 === 0) {
+            exform.appendChild(document.createElement("br"));
+          }
+          checkbox.addEventListener("change", handleCheckboxChange);
+        }
+
+        const inform = document.getElementById("include");
+        inform.style.whiteSpace = "nowrap";
+        for (let i = 1; i <= 45; i++) {
+          const div = document.createElement("div");
+          div.style.display = "inline-block";
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = "include";
+          checkbox.value = i;
+          const label = document.createElement("label");
+          label.textContent = i;
+          div.appendChild(checkbox);
+          div.appendChild(label);
+          inform.appendChild(div);
+          if (i % 5 === 0) {
+            inform.appendChild(document.createElement("br"));
+          }
+          checkbox.addEventListener("change", handleCheckboxChange);
+        }
+      }
+    </script>
+  </head>
+  <body onload="createCheckboxes()">
+    <div id="background">
+      <div id="con">
+        <div id="title">~로또 번호 생성기~</div>
+        <div id="column">
+          <div id="formarea">
+            <div>[제외할 숫자]</div>
+            <form id="exclude"></form>
+          </div>
+          <div id="formarea">
+            <div>[포함할 숫자]</div>
+            <form id="include"></form>
+          </div>
+        </div>
+        <button onclick="getRandomNumbers()">로또 번호 생성</button>
+        <div id="result"></div>
+      </div>
+    </div>
+  </body>
+</html>
